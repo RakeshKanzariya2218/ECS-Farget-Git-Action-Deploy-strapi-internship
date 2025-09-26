@@ -32,6 +32,7 @@ resource "aws_ecs_task_definition" "strapi_task" {
       environment = [
         { name = "HOST", value = "0.0.0.0" },
         { name = "PORT", value = "1337" },
+        {name  = "JWT_SECRET", value = "your-randomly-generated-secret"},
         { name = "DATABASE_CLIENT", value = "sqlite" },
         { name = "APP_KEYS", value = "randomkey123" },
         { name = "API_TOKEN_SALT", value = "randomsalt123" },

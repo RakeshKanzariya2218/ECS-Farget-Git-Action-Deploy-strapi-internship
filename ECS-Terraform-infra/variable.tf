@@ -20,5 +20,5 @@ default = ""
 
 variable "ecr_repository_url" {
 type = string
-default = "145065858967.dkr.ecr.ap-south-1.amazonaws.com/rakesh-strapi-gitactoin"
+default = "145065858967.dkr.ecr.ap-south-1.amazonaws.com/rakesh-strapi-gitaction"
 }

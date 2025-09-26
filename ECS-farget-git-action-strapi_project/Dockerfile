@@ -1,37 +1,37 @@
-
 FROM node:20-bullseye AS builder
 
 WORKDIR /app
 
-# Install required build tools (only for build stage)
+# Install build tools
 RUN apt-get update && apt-get install -y python3 build-essential && rm -rf /var/lib/apt/lists/*
 
-# Copy dependency files first (for better caching)
+# Copy dependency files and install
 COPY package*.json ./
-
-# Install dependencies (include dev for build step)
 RUN npm install --legacy-peer-deps
 
-# Copy full source
+# Copy source and build
 COPY . .
-
-# Build Strapi admin panel
+RUN mkdir -p ./data
 RUN npm run build
 
-#-----------------------------------------------------------------
+# --------------------
 FROM node:20-bullseye
 
 WORKDIR /app
-
-# Copy only the built app (with node_modules) from builder
 COPY --from=builder /app /app
 
-# Set environment variables
+# Ensure data folder exists
+RUN mkdir -p ./data
+
 ENV NODE_ENV=production \
     PORT=1337 \
-    HOST=0.0.0.0
+    HOST=0.0.0.0 \
+    DATABASE_CLIENT=sqlite \
+    DATABASE_FILENAME=./data/data.db \
+    APP_KEYS=randomkey123 \
+    API_TOKEN_SALT=randomsalt123 \
+    ADMIN_JWT_SECRET=adminsecret123
 
 EXPOSE 1337
 
-# Start Strapi in production mode
 CMD ["npm", "run", "start"]

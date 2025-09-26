@@ -7,7 +7,7 @@ on:
 
 env:
   AWS_REGION: ap-south-1
-  ECR_REPO: 132866222051.dkr.ecr.ap-south-1.amazonaws.com/rakesh-strapi-gitaction
+  ECR_REPO: 145065858967.dkr.ecr.ap-south-1.amazonaws.com/rakesh-strapi-gitaction
   PROJECT_NAME: rakesh-gitaction
 
 jobs:
@@ -80,7 +80,7 @@ jobs:
       - name: Terraform Init
         run: |
           cd ECS-Terraform-infra
-          terraform init -backend-config="bucket=rakesh.s3bucketpearlthoughtss" -backend-config="key=${PROJECT_NAME}-terraform.tfstate" -backend-config="region=$AWS_REGION"
+          terraform init -backend-config="bucket=rakesh.s3bucketpearlthoughts" -backend-config="key=${PROJECT_NAME}-terraform.tfstate" -backend-config="region=$AWS_REGION"
 
       # Terraform Plan
       - name: Terraform Plan

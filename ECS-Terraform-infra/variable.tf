@@ -3,7 +3,7 @@ variable "region" {
 }
 
 variable "vpc_id" {
-  default = "vpc-094949fef93e1b3b6"
+  default = "vpc-01b35def73b166fdc"
 }
 
 
@@ -20,5 +20,5 @@ default = ""
 
 variable "ecr_repository_url" {
 type = string
-default = "132866222051.dkr.ecr.ap-south-1.amazonaws.com/rakesh-strapi-gitaction"
+default = " 145065858967.dkr.ecr.ap-south-1.amazonaws.com/rakesh-strapi-gitaction"
 }

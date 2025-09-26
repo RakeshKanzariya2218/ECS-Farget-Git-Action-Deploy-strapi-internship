@@ -13,7 +13,7 @@ resource "aws_ecs_task_definition" "strapi_task" {
   cpu                      = "512"
   memory                   = "1024"
 
-  execution_role_arn = "arn:aws:iam::145065858967:role/adarshecsrole"
+  execution_role_arn = "arn:aws:iam::132866222051:role/adarshecsrole"
 
   container_definitions = jsonencode([
     {

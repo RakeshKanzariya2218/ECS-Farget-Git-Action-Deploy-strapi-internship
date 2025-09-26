@@ -25,18 +25,19 @@ resource "aws_ecs_task_definition" "strapi_task" {
         hostPort      = 1337
       }]
       environment = [
-        {
-          name  = "DATABASE_CLIENT"
-          value = "sqlite"
-        },
-        {
-          name  = "DATABASE_FILENAME"
-          value = "./data/data.db"
-        }
-      ]
+      { name = "HOST", value = "0.0.0.0" },
+      { name = "PORT", value = "1337" },
+      { name = "DATABASE_CLIENT", value = "sqlite" },
+      { name = "APP_KEYS", value = "randomkey123" },
+      { name = "API_TOKEN_SALT", value = "randomsalt123" },
+      { name = "ADMIN_JWT_SECRET", value = "adminsecret123" }
+    ]
     }
   ])
 }
+
+
+
 
 
 

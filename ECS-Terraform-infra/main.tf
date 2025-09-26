@@ -20,21 +20,44 @@ resource "aws_ecs_task_definition" "strapi_task" {
       name      = "${var.project_name}-strapi"
       image     = "${var.ecr_repository_url}:${var.image_tag}"
       essential = true
-      portMappings = [{
-        containerPort = 1337
-        hostPort      = 1337
-      }]
+
+      portMappings = [
+        {
+          containerPort = 1337
+          hostPort      = 1337
+        }
+      ]
+
       environment = [
-      { name = "HOST", value = "0.0.0.0" },
-      { name = "PORT", value = "1337" },
-      { name = "DATABASE_CLIENT", value = "sqlite" },
-      { name = "APP_KEYS", value = "randomkey123" },
-      { name = "API_TOKEN_SALT", value = "randomsalt123" },
-      { name = "ADMIN_JWT_SECRET", value = "adminsecret123" }
-    ]
+        { name = "HOST", value = "0.0.0.0" },
+        { name = "PORT", value = "1337" },
+        { name = "DATABASE_CLIENT", value = "sqlite" },
+        { name = "APP_KEYS", value = "randomkey123" },
+        { name = "API_TOKEN_SALT", value = "randomsalt123" },
+        { name = "ADMIN_JWT_SECRET", value = "adminsecret123" }
+      ]
+
+      mountPoints = [
+        {
+          sourceVolume  = "strapi-data"
+          containerPath = "/app/data"
+          readOnly      = false
+        }
+      ]
     }
   ])
+
+  volume {
+    name = "strapi-data"
+
+    efs_volume_configuration {
+      file_system_id      = "fs-0db8542466a928a96"
+      root_directory      = "/"
+      transit_encryption  = "ENABLED"
+    }
+  }
 }
+
 
 
 

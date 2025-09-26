@@ -63,12 +63,6 @@ resource "aws_ecs_task_definition" "strapi_task" {
 }
 
 
-resource "aws_cloudwatch_log_group" "ecs_log_group" {
-  name              = "/ecs/${var.project_name}-strapi"
-  retention_in_days = 7
-}
-
-
 ######### ecs service ##################
 
 

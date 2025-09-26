@@ -38,12 +38,12 @@ resource "aws_ecs_task_definition" "strapi_task" {
       ]
 
       mountPoints = [
-        {
-          sourceVolume  = "strapi-data"
-          containerPath = "/app/data"
-          readOnly      = false
-        }
-      ]
+  {
+    sourceVolume  = "strapi-data"
+    containerPath = "/app/public/uploads"
+    readOnly      = false
+  }
+]
     }
   ])
 
@@ -51,16 +51,12 @@ resource "aws_ecs_task_definition" "strapi_task" {
     name = "strapi-data"
 
     efs_volume_configuration {
-      file_system_id      = "fs-0db8542466a928a96"
+      file_system_id = aws_efs_file_system.strapi_efs.id
       root_directory      = "/"
       transit_encryption  = "ENABLED"
     }
   }
 }
-
-
-
-
 
 
 

@@ -80,7 +80,7 @@ jobs:
       - name: Terraform Init
         run: |
           cd ECS-Terraform-infra
-          terraform init -backend-config="bucket=rakesh.s3bucketpearlthoughts" -backend-config="key=${PROJECT_NAME}-terraform.tfstate" -backend-config="region=$AWS_REGION"
+          terraform init -backend-config="bucket=rakesh.s3bucketpearlthoughtss" -backend-config="key=${PROJECT_NAME}-terraform.tfstate" -backend-config="region=$AWS_REGION"
 
       # Terraform Plan
       - name: Terraform Plan

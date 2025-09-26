@@ -27,6 +27,7 @@ resource "aws_ecs_task_definition" "strapi_task" {
           hostPort      = 1337
         }
       ]
+      
 
       environment = [
         { name = "HOST", value = "0.0.0.0" },
@@ -36,6 +37,17 @@ resource "aws_ecs_task_definition" "strapi_task" {
         { name = "API_TOKEN_SALT", value = "randomsalt123" },
         { name = "ADMIN_JWT_SECRET", value = "adminsecret123" }
       ]
+      
+      
+      logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+      awslogs-group         = "/ecs/${var.project_name}-strapi"
+      awslogs-region        = var.region
+      awslogs-stream-prefix = "ecs"
+  }
+}
+
 
       mountPoints = [
   {
@@ -59,6 +71,10 @@ resource "aws_ecs_task_definition" "strapi_task" {
 }
 
 
+resource "aws_cloudwatch_log_group" "ecs_log_group" {
+  name              = "/ecs/${var.project_name}-strapi"
+  retention_in_days = 7
+}
 
 
 ######### ecs service ##################

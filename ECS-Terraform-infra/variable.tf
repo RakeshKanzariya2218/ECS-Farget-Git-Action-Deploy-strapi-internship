@@ -3,7 +3,7 @@ variable "region" {
 }
 
 variable "vpc_id" {
-  default = "vpc-01b35def73b166fdc"
+  default = "vpc-094949fef93e1b3b6"
 }
 
 

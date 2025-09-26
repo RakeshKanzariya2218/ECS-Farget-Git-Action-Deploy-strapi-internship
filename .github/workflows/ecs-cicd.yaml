@@ -37,11 +37,18 @@ jobs:
       # Delete old images in ECR 
       - name: Delete old ECR images
         run: |
-          aws ecr list-images --repository-name rakesh-strapi-gitaction --query 'imageIds[*]' --output json | \
-          jq '[.[] | {imageDigest: .imageDigest}]' > old_images.json
-          # Only delete if the file is not empty
-          if [ -s old_images.json ]; then
-          aws ecr batch-delete-image --repository-name rakesh-strapi-gitaction --image-ids file://old_images.json
+          aws ecr list-images \
+          --repository-name rakesh-strapi-gitaction \
+          --query 'imageIds[*]' \
+          --output json > old_images.json
+
+          # Only delete if the file is not empty and not just an empty array
+          if [ -s old_images.json ] && [ "$(jq length old_images.json)" -gt 0 ]; then
+          aws ecr batch-delete-image \
+          --repository-name rakesh-strapi-gitaction \
+          --image-ids file://old_images.json
+          else
+          echo "No old images found to delete."
           fi
 
       # Build Docker image with Git SHA:8

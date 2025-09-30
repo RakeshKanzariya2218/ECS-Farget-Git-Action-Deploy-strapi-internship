@@ -1,5 +1,5 @@
 resource "aws_lb" "strapi_alb" {
-  name               = "${var.project_name}-strapi-lb"
+  name               = "${var.project_name}-lb"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.strapi_sg.id]
   subnets            = data.aws_subnets.default.ids
@@ -9,7 +9,7 @@ resource "aws_lb" "strapi_alb" {
 }
 
 resource "aws_lb_target_group" "strapi_tg" {
-  name     = "${var.project_name}-strapi-tg"
+  name     = "${var.project_name}-tg"
   port     = 1337
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.vpc.id

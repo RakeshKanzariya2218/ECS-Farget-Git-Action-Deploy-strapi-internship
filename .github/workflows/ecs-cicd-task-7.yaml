@@ -1,0 +1,95 @@
+# name: CI/CD - Deploy Strapi on ECS Fargate
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# env:
+#   AWS_REGION: ap-south-1
+#   ECR_REPO: 145065858967.dkr.ecr.ap-south-1.amazonaws.com/rakesh-strapi-gitaction
+#   PROJECT_NAME: rakesh-gitaction
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
+
+#       # Configure AWS credentials
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
+
+      
+#       # Login to AWS ECR
+#       - name: Login to ECR
+#         run: |
+#           aws ecr get-login-password --region $AWS_REGION | \
+#           docker login --username AWS --password-stdin $ECR_REPO
+
+      
+#       # Delete old images in ECR 
+#       - name: Delete old ECR images
+#         run: |
+#           aws ecr list-images \
+#           --repository-name rakesh-strapi-gitaction \
+#           --query 'imageIds[*]' \
+#           --output json > old_images.json
+
+#           # Only delete if the file is not empty and not just an empty array
+#           if [ -s old_images.json ] && [ "$(jq length old_images.json)" -gt 0 ]; then
+#           aws ecr batch-delete-image \
+#           --repository-name rakesh-strapi-gitaction \
+#           --image-ids file://old_images.json
+#           else
+#           echo "No old images found to delete."
+#           fi
+
+#       # Build Docker image with Git SHA:8
+#       - name: Build Docker image
+#         run: |
+#           IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-8)
+#           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+#           docker build -t rakesh-strapi-gitaction ./ECS-farget-git-action-strapi_project
+          
+#       # Tag Builded image     
+#       - name: Tag image
+#         run:  docker tag rakesh-strapi-gitaction:latest $ECR_REPO:$IMAGE_TAG
+
+#       # Push image into ECR
+#       - name: Push image 
+#         run:  docker push $ECR_REPO:$IMAGE_TAG
+          
+# #--------------------------------------------------------------------------
+  
+#       # Install Terraform
+      
+#       - name: Install Terraform
+#         uses: hashicorp/setup-terraform@v2
+#         with:
+#           terraform_version: 1.7.0
+
+     
+#       # Terraform Init
+#       - name: Terraform Init
+#         run: |
+#           cd ECS-Terraform-infra-task-7
+#           terraform init -backend-config="bucket=rakesh.s3bucketpearlthoughts" -backend-config="key=${PROJECT_NAME}-terraform.tfstate" -backend-config="region=$AWS_REGION"
+
+#       # Terraform Plan
+#       - name: Terraform Plan
+#         run: |
+#           cd ECS-Terraform-infra-task-7
+#           terraform plan -var="image_tag=${IMAGE_TAG}" -var="region=${AWS_REGION}"
+
+#       # Terraform Apply
+#       - name: Terraform Apply
+#         run: |
+#           cd ECS-Terraform-infra-task-7
+#           terraform apply -auto-approve -var="image_tag=${IMAGE_TAG}" -var="region=${AWS_REGION}"

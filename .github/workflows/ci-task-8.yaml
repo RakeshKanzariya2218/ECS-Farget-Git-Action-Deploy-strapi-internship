@@ -1,4 +1,4 @@
-name: CI - Buld image and push in ecr 
+name: CI - Build image and push in ecr 
 on:
   push:
     branches:
@@ -55,13 +55,17 @@ jobs:
         run: |
           IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-8)
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-          docker build -t rakesh-strapi-cloudwatch-gitaction ./ECS-farget-git-action-strapi_project
-          
+          docker build -t rakesh-strapi-cloudwatch-gitaction:$IMAGE_TAG ./ECS-farget-git-action-strapi_project
+
       # Tag Builded image     
       - name: Tag image
-        run:  docker tag rakesh-strapi-cloudwatch-gitaction:latest $ECR_REPO:$IMAGE_TAG
-
+        run:  docker tag rakesh-strapi-cloudwatch-gitaction:$IMAGE_TAG $ECR_REPO:$IMAGE_TAG
+      
       # Push image into ECR
       - name: Push image 
         run:  docker push $ECR_REPO:$IMAGE_TAG
           
+      # Set IMAGE_TAG as workflow output for CD
+      - name: Set output IMAGE_TAG
+        run: echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
+     

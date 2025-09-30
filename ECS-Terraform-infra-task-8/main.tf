@@ -98,6 +98,10 @@ resource "aws_cloudwatch_log_group" "ecs_strapi" {
   retention_in_days = 7
 }
 
+resource "aws_sns_topic" "alerts" {
+  name = "${var.project_name}-alerts-topic"
+}
+
 
 resource "aws_cloudwatch_metric_alarm" "high_cpu" {
   alarm_name          = "${var.project_name}-strapi-high-cpu"

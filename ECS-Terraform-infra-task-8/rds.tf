@@ -34,7 +34,7 @@ resource "aws_security_group" "rds_sg" {
 
 
 resource "aws_db_parameter_group" "postgres_dev" {
-  name        = "${var.project_name}-postgres-dev-pg"
+  name        = "${var.project_name}-postgres-pg"
   family      = "postgres16"
   description = "Custom PG parameter group for dev without SSL"
 

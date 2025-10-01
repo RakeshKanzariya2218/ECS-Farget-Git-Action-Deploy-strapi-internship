@@ -13,10 +13,10 @@ data "aws_iam_role" "ecs_task_execution_role" {
 
 
 resource "aws_security_group" "strapi_sg" {
-  name   = "${var.project_name}-strapi-sg"
+  name   = "${var.project_name}--strapi-sg"
   vpc_id = data.aws_vpc.vpc.id
   tags = { 
-    Name = "${var.project_name}-strapi-sg"
+    Name = "${var.project_name}--strapi-sg"
    }
 
   ingress {

@@ -43,7 +43,7 @@ jobs:
           cd ECS-Terraform-infra-task-8
           terraform init \
           -backend-config="bucket=rakesh.s3bucketpearlthoughts" \
-          -backend-config="key=${PROJECT_NAME}-task-8-cloudwatch-terraform.tfstate" \
+          -backend-config="key=rakesh-task-8-cloudwatch-ecs-terraform.tfstate" \
           -backend-config="region=${AWS_REGION}"
 
       # Terraform Plan

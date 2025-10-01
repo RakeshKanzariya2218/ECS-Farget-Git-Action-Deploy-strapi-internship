@@ -48,9 +48,7 @@ resource "aws_ecs_task_definition" "strapi_task" {
         { name = "DATABASE_NAME", value = "dev" },
         { name = "DATABASE_USERNAME", value = var.db_username },
         { name = "DATABASE_PASSWORD", value = var.db_password },
-        { name = "DATABASE_SSL", value = "false" },
-        { name = "NODE_TLS_REJECT_UNAUTHORIZED", value = "0" }
-
+        { name = "DATABASE_SSL", value = "0" },
       ]
 
       logConfiguration = {

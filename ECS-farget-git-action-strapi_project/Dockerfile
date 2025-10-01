@@ -25,13 +25,9 @@ RUN mkdir -p ./data
 
 ENV NODE_ENV=production \
     PORT=1337 \
-    HOST=0.0.0.0 \
-    DATABASE_CLIENT=sqlite \
-    DATABASE_FILENAME=./data/data.db \
-    APP_KEYS=randomkey123 \
-    API_TOKEN_SALT=randomsalt123 \
-    ADMIN_JWT_SECRET=adminsecret123
-
+    HOST=0.0.0.0
+    
 EXPOSE 1337
 
 CMD ["npm", "run", "start"]
+

@@ -60,7 +60,7 @@ jobs:
       - name: Terraform Apply
         run: |
           cd ECS-Terraform-infra-task-8
-          terraform destroy -auto-approve \
+          terraform apply -auto-approve \
           -var="image_tag=${IMAGE_TAG}" \
           -var="region=${AWS_REGION}" \
           -var="db_username=${{ secrets.DB_USERNAME }}" \

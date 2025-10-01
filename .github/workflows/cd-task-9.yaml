@@ -1,0 +1,67 @@
+name: CD - Deploy with Terraform on ECS farget spot
+
+on:
+  workflow_run:
+    workflows: ["CI - Build image and push in ecr"]   
+    types:
+      - completed
+
+env:
+  AWS_REGION: ap-south-1
+  PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Install Terraform
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.0
+
+      # Set IMAGE_TAG from triggering workflow commit
+      - name: Set IMAGE_TAG from CI commit
+        run: |
+          IMAGE_TAG=$(echo ${{ github.event.workflow_run.head_commit.id }} | cut -c1-8)
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      # Terraform Init
+      - name: Terraform Init
+        run: |
+          cd ECS-Farget-spot-Terraform-infra-task-9
+          terraform init \
+          -backend-config="bucket=rakesh.s3bucketpearlthoughts" \
+          -backend-config="key=rakesh-task-9-farget-spot-terraform.tfstate" \
+          -backend-config="region=${AWS_REGION}"
+
+      # Terraform Plan
+      - name: Terraform Plan
+        run: |
+          cd ECS-Farget-spot-Terraform-infra-task-9
+          terraform plan \
+          -var="image_tag=${IMAGE_TAG}" \
+          -var="region=${AWS_REGION}" \
+          -var="db_username=${{ secrets.DB_USERNAME }}" \
+          -var="db_password=${{ secrets.DB_PASSWORD }}"
+
+      # Terraform Apply
+      - name: Terraform Apply
+        run: |
+          cd ECS-Farget-spot-Terraform-infra-task-9
+          terraform apply -auto-approve \
+          -var="image_tag=${IMAGE_TAG}" \
+          -var="region=${AWS_REGION}" \
+          -var="db_username=${{ secrets.DB_USERNAME }}" \
+          -var="db_password=${{ secrets.DB_PASSWORD }}"

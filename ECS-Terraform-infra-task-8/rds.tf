@@ -33,6 +33,19 @@ resource "aws_security_group" "rds_sg" {
 }
 
 
+resource "aws_db_parameter_group" "postgres_dev" {
+  name        = "${var.project_name}-postgres-dev-pg"
+  family      = "postgres16"
+  description = "Custom PG parameter group for dev without SSL"
+
+  parameter {
+    name  = "rds.force_ssl"
+    value = "0"
+  }
+}
+
+
+
 resource "aws_db_instance" "rds-1" {
   allocated_storage = 20                              
   identifier = "${var.project_name}-postgres"                           
@@ -44,7 +57,7 @@ resource "aws_db_instance" "rds-1" {
   password = var.db_password              
   vpc_security_group_ids  = [aws_security_group.rds_sg.id]      
   db_subnet_group_name = aws_db_subnet_group.group.id
-  parameter_group_name = "default.postgres16"           
+  parameter_group_name   = aws_db_parameter_group.postgres_dev.name         
   backup_retention_period = 7                        
   backup_window = "02:00-03:00"                       
   maintenance_window = "sun:04:00-sun:05:00"                            

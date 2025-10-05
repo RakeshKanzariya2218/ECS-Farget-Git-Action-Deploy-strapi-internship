@@ -2,7 +2,7 @@ name: CD - Blue-Green ECS Deployment
 
 on:
   workflow_run:
-    workflows: ["CI - Blue-Green image push in ECR"]   
+    workflows: ["CI - Blue-Green image push in ECR"]
     types:
       - completed
 
@@ -27,7 +27,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # Install Terraform
       - name: Install Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -73,27 +72,41 @@ jobs:
       # Trigger CodeDeploy for Blue-Green deployment
       - name: Trigger CodeDeploy Deployment
         run: |
+          # Get the latest task definition ARN
           TASK_DEF_ARN=$(aws ecs list-task-definitions \
             --family-prefix rakesh-blue-green-ecs-strapi-task \
             --sort DESC \
             --max-items 1 \
             --query 'taskDefinitionArns[0]' \
             --output text)
-          
+
           echo "Deploying task definition: $TASK_DEF_ARN"
 
+          # Generate AppSpec JSON for ECS Blue/Green deployment
+          APPSPEC_JSON=$(jq -n \
+            --arg td "$TASK_DEF_ARN" \
+            '{
+              Resources: [
+                {
+                  TargetService: {
+                    Type: "AWS::ECS::Service",
+                    Properties: {
+                      TaskDefinition: $td,
+                      LoadBalancerInfo: {
+                        ContainerName: "strapi",
+                        ContainerPort: 1337
+                      }
+                    }
+                  }
+                }
+              ]
+            }')
+
+          # Trigger CodeDeploy
           aws deploy create-deployment \
             --application-name "${PROJECT_NAME}-codedeploy-app" \
             --deployment-group-name "${PROJECT_NAME}-deployment-group" \
             --deployment-config-name "CodeDeployDefault.ECSCanary10Percent5Minutes" \
-            --revision "{\"revisionType\":\"AppSpecContent\",\"appSpecContent\":{\"version\":\"1.0\",\"Resources\":[{\"TargetService\":{\"Type\":\"AWS::ECS::Service\",\"Properties\":{\"TaskDefinition\":\"${TASK_DEF_ARN}\",\"LoadBalancerInfo\":{\"ContainerName\":\"strapi\",\"ContainerPort\":1337}}}}]}}" \
+            --revision "{\"revisionType\":\"AppSpecContent\",\"appSpecContent\":{\"content\":$APPSPEC_JSON}}" \
             --description "Triggered by GitHub Actions for image $IMAGE_TAG" \
             --output text
-
-    
-
-    
-
-
-
-        

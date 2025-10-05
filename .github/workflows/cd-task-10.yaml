@@ -10,6 +10,7 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
   ACM_CERTIFICATE_ARN: ${{ secrets.ACM_CERTIFICATE_ARN }}
+  ECR_REPO: 132866222051.dkr.ecr.us-east-1.amazonaws.com/rakesh-blue-green-ecs
 
 jobs:
   deploy:
@@ -68,3 +69,14 @@ jobs:
           -var="acm_certificate_arn=${{ secrets.ACM_CERTIFICATE_ARN }}" \
           -var="db_username=${{ secrets.DB_USERNAME }}" \
           -var="db_password=${{ secrets.DB_PASSWORD }}"
+
+      # Trigger CodeDeploy for Blue-Green deployment
+      - name: Trigger CodeDeploy Deployment
+        run: |
+          aws deploy create-deployment \
+            --application-name "${PROJECT_NAME}-codedeploy-app" \
+            --deployment-group-name "${PROJECT_NAME}-deployment-group" \
+            --deployment-config-name "CodeDeployDefault.ECSCanary10Percent5Minutes" \
+            --file-exists-behavior OVERWRITE \
+            --description "Triggered by GitHub Actions for image $IMAGE_TAG" \
+            --output text

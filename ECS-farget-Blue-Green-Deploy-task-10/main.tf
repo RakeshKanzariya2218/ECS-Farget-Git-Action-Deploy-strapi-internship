@@ -100,7 +100,7 @@ resource "aws_ecs_service" "strapi_service" {
     aws_lb_listener.https_listener
   ]
 
-  lifecycle {
+  lifecycle {                            # Terraform will ignore to update service itselt if changes will come in the task definition (New revision )
   ignore_changes = [task_definition]
 }
 

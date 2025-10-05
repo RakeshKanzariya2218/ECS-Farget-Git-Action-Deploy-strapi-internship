@@ -1,9 +1,9 @@
 variable "region" {
-  default = "ap-south-1"
+  default = "us-east-1"
 }
 
 variable "vpc_id" {
-  default = "vpc-01b35def73b166fdc"
+  default = "vpc-08d5eddd5bf3a6907"
 }
 
 
@@ -20,7 +20,7 @@ default = ""
 
 variable "ecr_repository_url" {
 type = string
-default = "145065858967.dkr.ecr.ap-south-1.amazonaws.com/rakesh-blue-green-ecs"
+default = "132866222051.dkr.ecr.us-east-1.amazonaws.com/rakesh-blue-green-ecs"
 }
 
 

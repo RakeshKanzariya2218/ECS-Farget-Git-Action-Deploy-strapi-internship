@@ -9,7 +9,7 @@ resource "aws_codedeploy_app" "strapi" {
 resource "aws_codedeploy_deployment_group" "strapi" {
   app_name              = aws_codedeploy_app.strapi.name
   deployment_group_name = "${var.project_name}-deployment-group"
-  service_role_arn      = "arn:aws:iam::145065858967:role/adarshecsrole" 
+  service_role_arn      = data.aws_iam_role.code_deploy_role.arn 
 
   deployment_config_name = "CodeDeployDefault.ECSCanary10Percent5Minutes"
 

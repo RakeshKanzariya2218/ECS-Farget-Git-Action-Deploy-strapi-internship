@@ -6,7 +6,7 @@ on:
 
 env:
   AWS_REGION: ${{secrets.AWS_REGION}}
-  ECR_REPO: 145065858967.dkr.ecr.ap-south-1.amazonaws.com/rakesh-blue-green-ecs
+  ECR_REPO: 132866222051.dkr.ecr.us-east-1.amazonaws.com/rakesh-blue-green-ecs
   PROJECT_NAME: ${{secrets.PROJECT_NAME}}
 
 jobs:

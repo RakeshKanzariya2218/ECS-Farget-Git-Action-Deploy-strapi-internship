@@ -2,14 +2,12 @@
 ############ iam role and policy ##############
 
 data "aws_iam_role" "ecs_task_execution_role" {
-  name = "adarshecsrole"
+  name = "ecsTaskExecutionRole"
 }
 
-
-resource "aws_iam_role_policy_attachment" "codedeploy_ecs_attach" {
-  role       = "adarshecsrole"   
-  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS"
-}
+ data "aws_iam_role" "code_deploy_role" {
+  name = "ecs-codedeploy"
+ }
 
 
 

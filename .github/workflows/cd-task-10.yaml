@@ -93,7 +93,7 @@ jobs:
                     Properties: {
                       TaskDefinition: $td,
                       LoadBalancerInfo: {
-                        ContainerName: "strapi",
+                        ContainerName: "rakesh-blue-green-strapi",
                         ContainerPort: 1337
                       }
                     }

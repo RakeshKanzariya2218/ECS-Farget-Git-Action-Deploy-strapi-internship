@@ -99,6 +99,11 @@ resource "aws_ecs_service" "strapi_service" {
     aws_lb_listener.http_listener,
     aws_lb_listener.https_listener
   ]
+
+  lifecycle {
+  ignore_changes = [task_definition]
+}
+
 }
 
 

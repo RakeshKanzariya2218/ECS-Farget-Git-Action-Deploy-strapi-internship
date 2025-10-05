@@ -73,10 +73,27 @@ jobs:
       # Trigger CodeDeploy for Blue-Green deployment
       - name: Trigger CodeDeploy Deployment
         run: |
+          TASK_DEF_ARN=$(aws ecs list-task-definitions \
+            --family-prefix rakesh-blue-green-ecs-strapi-task \
+            --sort DESC \
+            --max-items 1 \
+            --query 'taskDefinitionArns[0]' \
+            --output text)
+          
+          echo "Deploying task definition: $TASK_DEF_ARN"
+
           aws deploy create-deployment \
             --application-name "${PROJECT_NAME}-codedeploy-app" \
             --deployment-group-name "${PROJECT_NAME}-deployment-group" \
             --deployment-config-name "CodeDeployDefault.ECSCanary10Percent5Minutes" \
-            --file-exists-behavior OVERWRITE \
+            --revision "{\"revisionType\":\"AppSpecContent\",\"appSpecContent\":{\"version\":\"1.0\",\"Resources\":[{\"TargetService\":{\"Type\":\"AWS::ECS::Service\",\"Properties\":{\"TaskDefinition\":\"${TASK_DEF_ARN}\",\"LoadBalancerInfo\":{\"ContainerName\":\"strapi\",\"ContainerPort\":1337}}}}]}}" \
             --description "Triggered by GitHub Actions for image $IMAGE_TAG" \
             --output text
+
+    
+
+    
+
+
+
+        

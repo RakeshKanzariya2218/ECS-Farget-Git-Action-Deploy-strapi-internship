@@ -82,7 +82,7 @@ jobs:
 
           echo "Deploying task definition: $TASK_DEF_ARN"
 
-          # Generate AppSpec JSON as a compact string
+          # Generate AppSpec JSON compact string
           APPSPEC_JSON=$(jq -c -n \
             --arg td "$TASK_DEF_ARN" \
             '{
@@ -102,13 +102,17 @@ jobs:
               ]
             }')
 
-          echo "AppSpec JSON: $APPSPEC_JSON"
+          echo "AppSpec JSON:"
+          echo "$APPSPEC_JSON"
+
+          # Escape quotes for AWS CLI
+          ESCAPED_APPSPEC_JSON=$(echo "$APPSPEC_JSON" | jq -Rsa .)
 
           # Trigger CodeDeploy
           aws deploy create-deployment \
             --application-name "${PROJECT_NAME}-codedeploy-app" \
             --deployment-group-name "${PROJECT_NAME}-deployment-group" \
             --deployment-config-name "CodeDeployDefault.ECSCanary10Percent5Minutes" \
-            --revision "{\"revisionType\":\"AppSpecContent\",\"appSpecContent\":{\"content\":\"$APPSPEC_JSON\"}}" \
+            --revision "{\"revisionType\":\"AppSpecContent\",\"appSpecContent\":{\"content\":$ESCAPED_APPSPEC_JSON}}" \
             --description "Triggered by GitHub Actions for image $IMAGE_TAG" \
             --output text

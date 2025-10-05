@@ -21,9 +21,12 @@ resource "aws_codedeploy_deployment_group" "strapi" {
   load_balancer_info {
     target_group_pair_info {
       prod_traffic_route {
+        listener_arns = [aws_lb_listener.https_listener.arn]
+      }
 
-        listener_arns = [ aws_lb_listener.http_listener.arn, aws_lb_listener.https_listener.arn ]
-
+      # Optional: use test_traffic_route for pre-traffic validation (if needed)
+      test_traffic_route {
+        listener_arns = [aws_lb_listener.http_listener.arn]
       }
 
       target_group {

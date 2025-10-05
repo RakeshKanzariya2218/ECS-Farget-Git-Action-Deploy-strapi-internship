@@ -6,6 +6,12 @@ data "aws_iam_role" "ecs_task_execution_role" {
 }
 
 
+resource "aws_iam_role_policy_attachment" "codedeploy_ecs_attach" {
+  role       = "adarshecsrole"   
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS"
+}
+
+
 
 
 ######### security group ##############

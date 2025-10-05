@@ -82,8 +82,8 @@ jobs:
 
           echo "Deploying task definition: $TASK_DEF_ARN"
 
-          # Generate AppSpec JSON for ECS Blue/Green deployment
-          APPSPEC_JSON=$(jq -n \
+          # Generate AppSpec JSON as a compact string
+          APPSPEC_JSON=$(jq -c -n \
             --arg td "$TASK_DEF_ARN" \
             '{
               Resources: [
@@ -102,11 +102,13 @@ jobs:
               ]
             }')
 
+          echo "AppSpec JSON: $APPSPEC_JSON"
+
           # Trigger CodeDeploy
           aws deploy create-deployment \
             --application-name "${PROJECT_NAME}-codedeploy-app" \
             --deployment-group-name "${PROJECT_NAME}-deployment-group" \
             --deployment-config-name "CodeDeployDefault.ECSCanary10Percent5Minutes" \
-            --revision "{\"revisionType\":\"AppSpecContent\",\"appSpecContent\":{\"content\":$APPSPEC_JSON}}" \
+            --revision "{\"revisionType\":\"AppSpecContent\",\"appSpecContent\":{\"content\":\"$APPSPEC_JSON\"}}" \
             --description "Triggered by GitHub Actions for image $IMAGE_TAG" \
             --output text

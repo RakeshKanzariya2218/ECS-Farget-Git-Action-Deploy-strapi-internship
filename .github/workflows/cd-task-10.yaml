@@ -74,7 +74,7 @@ jobs:
         run: |
           # Get the latest task definition ARN
           TASK_DEF_ARN=$(aws ecs list-task-definitions \
-            --family-prefix rakesh-blue-green-ecs-strapi-task \
+            --family-prefix rakesh-blue-green-strapi-task \
             --sort DESC \
             --max-items 1 \
             --query 'taskDefinitionArns[0]' \

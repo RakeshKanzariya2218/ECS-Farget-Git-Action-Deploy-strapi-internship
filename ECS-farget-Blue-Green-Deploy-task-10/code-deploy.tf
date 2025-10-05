@@ -59,3 +59,7 @@ resource "aws_codedeploy_deployment_group" "strapi" {
     deployment_type   = "BLUE_GREEN"
   }
 }
+
+
+
+

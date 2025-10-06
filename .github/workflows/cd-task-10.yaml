@@ -10,7 +10,7 @@ env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
   ACM_CERTIFICATE_ARN: ${{ secrets.ACM_CERTIFICATE_ARN }}
-  ECR_REPO: 132866222051.dkr.ecr.us-east-1.amazonaws.com/rakesh-blue-green-ecs
+  ECR_REPO: 145065858967.dkr.ecr.ap-south-1.amazonaws.com/rakesh-blue-green-ecs
 
 jobs:
   deploy:
@@ -43,7 +43,7 @@ jobs:
         run: |
           cd ECS-farget-Blue-Green-Deploy-task-10
           terraform init \
-          -backend-config="bucket=rkanzariya.info" \
+          -backend-config="bucket=rakesh.s3bucketpearlthoughts" \
           -backend-config="key=rakesh-task-10-blue-green.tfstate" \
           -backend-config="region=${AWS_REGION}"
 

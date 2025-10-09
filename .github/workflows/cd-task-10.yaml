@@ -69,11 +69,11 @@ jobs:
           -var="db_username=${{ secrets.DB_USERNAME }}" \
           -var="db_password=${{ secrets.DB_PASSWORD }}"
 
-      
       # Trigger CodeDeploy for Blue-Green deployment
       - name: Trigger CodeDeploy Deployment
+        id: codedeploy
         run: |
-          # Get the latest task definition ARN
+          # Get latest ECS task definition
           TASK_DEF_ARN=$(aws ecs list-task-definitions \
             --family-prefix rakesh-blue-green-strapi-task \
             --sort DESC \
@@ -81,9 +81,9 @@ jobs:
             --query 'taskDefinitionArns[0]' \
             --output text)
 
-          echo "Deploying task definition: $TASK_DEF_ARN"
+          echo "Deploying Task Definition: $TASK_DEF_ARN"
 
-          # Generate AppSpec JSON compact string
+          # Prepare AppSpec JSON
           APPSPEC_JSON=$(jq -c -n \
             --arg td "$TASK_DEF_ARN" \
             '{
@@ -103,22 +103,53 @@ jobs:
               ]
             }')
 
-          echo "AppSpec JSON:"
-          echo "$APPSPEC_JSON"
+          echo "AppSpec JSON Prepared"
 
-          # Escape quotes for AWS CLI
+          # Escape JSON for CLI
           ESCAPED_APPSPEC_JSON=$(echo "$APPSPEC_JSON" | jq -Rsa .)
 
-          # Trigger CodeDeploy
-          aws deploy create-deployment \
+          # Trigger CodeDeploy Deployment
+          DEPLOYMENT_ID=$(aws deploy create-deployment \
             --application-name "${PROJECT_NAME}-codedeploy-app" \
             --deployment-group-name "${PROJECT_NAME}-deployment-group" \
             --deployment-config-name "CodeDeployDefault.ECSCanary10Percent5Minutes" \
             --revision "{\"revisionType\":\"AppSpecContent\",\"appSpecContent\":{\"content\":$ESCAPED_APPSPEC_JSON}}" \
             --description "Triggered by GitHub Actions for image $IMAGE_TAG" \
-            --output text      
+            --query "deploymentId" \
+            --output text)
 
-          
+          echo "Deployment triggered successfully with ID: $DEPLOYMENT_ID"
+          echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
+
+      # Monitor CodeDeploy Deployment Status
+      - name: Monitor Deployment Status
+        run: |
+          echo "Monitoring deployment progress..."
+          DEPLOYMENT_ID=${{ env.DEPLOYMENT_ID }}
+
+          STATUS=""
+          while true; do
+            STATUS=$(aws deploy get-deployment \
+              --deployment-id "$DEPLOYMENT_ID" \
+              --query "deploymentInfo.status" \
+              --output text)
+
+            echo "Current Deployment Status: $STATUS"
+
+            if [ "$STATUS" = "Succeeded" ]; then
+              echo "Deployment succeeded!"
+              break
+            elif [ "$STATUS" = "Failed" ]; then
+              echo "Deployment failed! Initiating rollback..."
+              aws deploy stop-deployment \
+                --deployment-id "$DEPLOYMENT_ID" \
+                --auto-rollback-enabled
+              exit 1
+            else
+              echo " Waiting for deployment to complete..."
+              sleep 30
+            fi
+          done
 
       
 
@@ -132,11 +163,12 @@ jobs:
 
 
 
+      
+
       # # Trigger CodeDeploy for Blue-Green deployment
       # - name: Trigger CodeDeploy Deployment
-      #   id: codedeploy
       #   run: |
-      #     # Get latest ECS task definition
+      #     # Get the latest task definition ARN
       #     TASK_DEF_ARN=$(aws ecs list-task-definitions \
       #       --family-prefix rakesh-blue-green-strapi-task \
       #       --sort DESC \
@@ -144,9 +176,9 @@ jobs:
       #       --query 'taskDefinitionArns[0]' \
       #       --output text)
 
-      #     echo "Deploying Task Definition: $TASK_DEF_ARN"
+      #     echo "Deploying task definition: $TASK_DEF_ARN"
 
-      #     # Prepare AppSpec JSON
+      #     # Generate AppSpec JSON compact string
       #     APPSPEC_JSON=$(jq -c -n \
       #       --arg td "$TASK_DEF_ARN" \
       #       '{
@@ -166,50 +198,21 @@ jobs:
       #         ]
       #       }')
 
-      #     echo "AppSpec JSON Prepared"
+      #     echo "AppSpec JSON:"
+      #     echo "$APPSPEC_JSON"
 
-      #     # Escape JSON for CLI
+      #     # Escape quotes for AWS CLI
       #     ESCAPED_APPSPEC_JSON=$(echo "$APPSPEC_JSON" | jq -Rsa .)
 
-      #     # Trigger CodeDeploy Deployment
-      #     DEPLOYMENT_ID=$(aws deploy create-deployment \
+      #     # Trigger CodeDeploy
+      #     aws deploy create-deployment \
       #       --application-name "${PROJECT_NAME}-codedeploy-app" \
       #       --deployment-group-name "${PROJECT_NAME}-deployment-group" \
       #       --deployment-config-name "CodeDeployDefault.ECSCanary10Percent5Minutes" \
       #       --revision "{\"revisionType\":\"AppSpecContent\",\"appSpecContent\":{\"content\":$ESCAPED_APPSPEC_JSON}}" \
       #       --description "Triggered by GitHub Actions for image $IMAGE_TAG" \
-      #       --query "deploymentId" \
-      #       --output text)
+      #       --output text      
 
-      #     echo "Deployment triggered successfully with ID: $DEPLOYMENT_ID"
-      #     echo "DEPLOYMENT_ID=$DEPLOYMENT_ID" >> $GITHUB_ENV
+          
 
-      # # Monitor CodeDeploy Deployment Status
-      # - name: Monitor Deployment Status
-      #   run: |
-      #     echo "Monitoring deployment progress..."
-      #     DEPLOYMENT_ID=${{ env.DEPLOYMENT_ID }}
-
-      #     STATUS=""
-      #     while true; do
-      #       STATUS=$(aws deploy get-deployment \
-      #         --deployment-id "$DEPLOYMENT_ID" \
-      #         --query "deploymentInfo.status" \
-      #         --output text)
-
-      #       echo "Current Deployment Status: $STATUS"
-
-      #       if [ "$STATUS" = "Succeeded" ]; then
-      #         echo "Deployment succeeded!"
-      #         break
-      #       elif [ "$STATUS" = "Failed" ]; then
-      #         echo "Deployment failed! Initiating rollback..."
-      #         aws deploy stop-deployment \
-      #           --deployment-id "$DEPLOYMENT_ID" \
-      #           --auto-rollback-enabled
-      #         exit 1
-      #       else
-      #         echo " Waiting for deployment to complete..."
-      #         sleep 30
-      #       fi
-          # done
+          

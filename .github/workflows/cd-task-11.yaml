@@ -44,7 +44,7 @@ jobs:
           cd ECS-farget-Blue-Green-Deploy-task-10
           terraform init \
           -backend-config="bucket=rakesh.s3bucketpearlthoughts" \
-          -backend-config="rakesh-task-11-codedeploy.tfstate" \
+          -backend-config="key=rakesh-task-11-codedeploy.tfstate" \
           -backend-config="region=${AWS_REGION}"
 
       # Terraform Plan

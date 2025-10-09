@@ -9,7 +9,7 @@ variable "vpc_id" {
 
 
 variable "project_name" {
-  default = "rakesh-11-blue-green"
+  default = "rakesh-11-codedeploy"
 }
 
 variable "image_tag" {

@@ -44,7 +44,7 @@ jobs:
           cd ECS-farget-Blue-Green-Deploy-task-10
           terraform init \
           -backend-config="bucket=rakesh.s3bucketpearlthoughts" \
-          -backend-config="key=rakesh-task-11-monitoring-blue-green.tfstate" \
+          -backend-config="rakesh-task-11-codedeploy.tfstate" \
           -backend-config="region=${AWS_REGION}"
 
       # Terraform Plan
@@ -75,7 +75,7 @@ jobs:
         run: |
           # Get latest ECS task definition
           TASK_DEF_ARN=$(aws ecs list-task-definitions \
-            --family-prefix rakesh-blue-green-strapi-task \
+            --family-prefix rakesh-11-codedeploy-strapi-task \
             --sort DESC \
             --max-items 1 \
             --query 'taskDefinitionArns[0]' \
@@ -94,7 +94,7 @@ jobs:
                     Properties: {
                       TaskDefinition: $td,
                       LoadBalancerInfo: {
-                        ContainerName: "rakesh-blue-green-strapi",
+                        ContainerName: "rakesh-11-codedeploy-strapi",
                         ContainerPort: 1337
                       }
                     }

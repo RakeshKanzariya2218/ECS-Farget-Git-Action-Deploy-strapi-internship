@@ -101,7 +101,7 @@ resource "aws_ecs_service" "strapi_service" {
   ]
 
   lifecycle {                            # Terraform will ignore to update service itselt if changes will come in the task definition (New revision )
-  ignore_changes = [load_balancer, task_definition, desired_count]
+  ignore_changes = [task_definition]
 }
 
 }

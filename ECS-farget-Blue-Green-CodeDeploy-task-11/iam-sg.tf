@@ -2,11 +2,11 @@
 ############ iam role and policy ##############
 
 data "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecsTaskExecutionRole"
+  name = "rakesh-ecs-ecr-role"
 }
 
  data "aws_iam_role" "code_deploy_role" {
-  name = "ecs-codedeploy"
+  name = "rakesh-codedeploy-role"
  }
 
 

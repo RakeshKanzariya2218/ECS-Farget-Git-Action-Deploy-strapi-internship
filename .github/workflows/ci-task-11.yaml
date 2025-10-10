@@ -1,71 +1,71 @@
-name: CI - Blue-Green image push in ECR 
-on:
-  push:
-    branches:
-      - main
+# name: CI - Blue-Green image push in ECR 
+# on:
+#   push:
+#     branches:
+#       - main
 
-env:
-  AWS_REGION: ${{secrets.AWS_REGION}}
-  ECR_REPO: 145065858967.dkr.ecr.ap-south-1.amazonaws.com/rakesh-blue-green-ecs
-  PROJECT_NAME: ${{secrets.PROJECT_NAME}}
+# env:
+#   AWS_REGION: ${{secrets.AWS_REGION}}
+#   ECR_REPO: 145065858967.dkr.ecr.ap-south-1.amazonaws.com/rakesh-blue-green-ecs
+#   PROJECT_NAME: ${{secrets.PROJECT_NAME}}
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v3
 
-      # Configure AWS credentials
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      
-      # Login to AWS ECR
-      - name: Login to ECR
-        run: |
-          aws ecr get-login-password --region $AWS_REGION | \
-          docker login --username AWS --password-stdin $ECR_REPO
+#       # Configure AWS credentials
+#       - name: Configure AWS credentials
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
 
       
-      # Delete old images in ECR 
-      - name: Delete old ECR images
-        run: |
-          aws ecr list-images \
-          --repository-name rakesh-blue-green-ecs \
-          --query 'imageIds[*]' \
-          --output json > old_images.json
+#       # Login to AWS ECR
+#       - name: Login to ECR
+#         run: |
+#           aws ecr get-login-password --region $AWS_REGION | \
+#           docker login --username AWS --password-stdin $ECR_REPO
 
-          # Only delete if the file is not empty and not just an empty array
-          if [ -s old_images.json ] && [ "$(jq length old_images.json)" -gt 0 ]; then
-          aws ecr batch-delete-image \
-          --repository-name rakesh-blue-green-ecs \
-          --image-ids file://old_images.json
-          else
-          echo "No old images found to delete."
-          fi
-
-      # Build Docker image with Git SHA:8
-      - name: Build Docker image
-        run: |
-          IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-8)
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
-          docker build -t rakesh-blue-green-ecs:$IMAGE_TAG ./ECS-farget-git-action-strapi_project
-
-      # Tag Builded image     
-      - name: Tag image
-        run:  docker tag rakesh-blue-green-ecs:$IMAGE_TAG $ECR_REPO:$IMAGE_TAG
       
-      # Push image into ECR
-      - name: Push image 
-        run:  docker push $ECR_REPO:$IMAGE_TAG
+#       # Delete old images in ECR 
+#       - name: Delete old ECR images
+#         run: |
+#           aws ecr list-images \
+#           --repository-name rakesh-blue-green-ecs \
+#           --query 'imageIds[*]' \
+#           --output json > old_images.json
+
+#           # Only delete if the file is not empty and not just an empty array
+#           if [ -s old_images.json ] && [ "$(jq length old_images.json)" -gt 0 ]; then
+#           aws ecr batch-delete-image \
+#           --repository-name rakesh-blue-green-ecs \
+#           --image-ids file://old_images.json
+#           else
+#           echo "No old images found to delete."
+#           fi
+
+#       # Build Docker image with Git SHA:8
+#       - name: Build Docker image
+#         run: |
+#           IMAGE_TAG=$(echo $GITHUB_SHA | cut -c1-8)
+#           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+#           docker build -t rakesh-blue-green-ecs:$IMAGE_TAG ./ECS-farget-git-action-strapi_project
+
+#       # Tag Builded image     
+#       - name: Tag image
+#         run:  docker tag rakesh-blue-green-ecs:$IMAGE_TAG $ECR_REPO:$IMAGE_TAG
+      
+#       # Push image into ECR
+#       - name: Push image 
+#         run:  docker push $ECR_REPO:$IMAGE_TAG
           
-      # Set IMAGE_TAG as workflow output for CD
-      - name: Set output IMAGE_TAG
-        run: echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
+#       # Set IMAGE_TAG as workflow output for CD
+#       - name: Set output IMAGE_TAG
+#         run: echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
      

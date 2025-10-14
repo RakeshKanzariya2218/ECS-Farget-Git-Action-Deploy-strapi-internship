@@ -6,7 +6,7 @@ Word Docs: https://drive.google.com/file/d/1YhEg_9pj9a52SE7IWu-iKXxjPUJm02RZ/vie
 
 # Docker Image Size Reduction
 
-## Task #14: Study on Image Size Reduction of Docker Images
+## Task-14: Study on Image Size Reduction of Docker Images
 
 ---
 
@@ -49,11 +49,11 @@ Reducing image size solves these issues and improves deployment efficiency.
 ### 3.1 Use a Smaller Base Image
 - Heavy base images like `ubuntu` increase image size.
 - Use smaller base images like `alpine` or `busybox`.
-# Large base image
+#### Large base image
 ```dockerfile
 FROM ubuntu:22.04
 ```
-# Small base image
+#### Small base image
 ```dockerfile
 FROM alpine:3.18
 ```
@@ -97,7 +97,7 @@ For compiled applications, use multi-stage builds to keep only final artifacts:
 
 dockerfile
 Copy code
-# Build stage
+#### Build stage
 ```
 FROM golang:1.20 AS builder
 WORKDIR /app
@@ -105,7 +105,7 @@ COPY . .
 RUN go build -o myapp
 ```
 
-# Final stage
+#### Final stage
 ```
 FROM alpine:3.18
 COPY --from=builder /app/myapp /myapp

@@ -1,4 +1,4 @@
-#  Task #14 — Image Size Reduction of Docker Images
+#  Task : 14 — Image Size Reduction of Docker Images
 
 ##  Overview
 

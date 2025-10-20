@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# ===============================
+
 # Log Management Script
-# ===============================
+
 
 LOG_DIR="/var/logs/checkins"
 BACKUP_DIR="/backup/logs"
